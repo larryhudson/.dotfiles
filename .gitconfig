@@ -1,0 +1,7 @@
+[user]
+	name = Larry Hudson
+	email = 10627494+larryhudson@users.noreply.github.com 
+[core]
+	editor = nvim
+[init]
+	defaultBranch = main
