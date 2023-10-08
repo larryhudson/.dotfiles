@@ -3,6 +3,8 @@
 - neovim
   - on Arch, `sudo pacman -S neovim`
   - on Ubuntu, use the [unstable PPA](https://launchpad.net/~neovim-ppa/+archive/ubuntu/unstable)
+  - install ripgrep
+  - install lazygit
 - tmux
 - alacritty
 
