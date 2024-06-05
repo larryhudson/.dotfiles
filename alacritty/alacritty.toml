@@ -17,3 +17,14 @@ style = "Italic"
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 style = "Regular"
+
+[key_bindings]
+[[key_bindings]]
+key = "N"
+mods = "Control"
+chars = "\x0e"  # ASCII for Ctrl+n
+
+[[key_bindings]]
+key = "P"
+mods = "Control"
+chars = "\x10"  # ASCII for Ctrl+p
