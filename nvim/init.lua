@@ -876,6 +876,9 @@ require('lazy').setup({
           javascript = { 'eslint' },
           typescript = { 'eslint' },
         }
+
+        -- Set up keymap for applying fixes
+        vim.keymap.set('n', '<leader>af', vim.cmd.ALEFix, { desc = '[A]LE [F]ix' })
       end,
     },
   },
