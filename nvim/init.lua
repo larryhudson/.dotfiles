@@ -866,9 +866,13 @@ require('lazy').setup({
         g.ale_linters = {
           ruby = { 'rubocop', 'ruby' },
           lua = { 'lua_language_server' },
-          python = { 'pylint' },
+          python = { 'pylint', 'ruff' },
           javascript = { 'eslint' },
           typescript = { 'eslint' },
+        }
+        
+        g.ale_fixers = {
+          python = { 'ruff' },
         }
       end,
     },
