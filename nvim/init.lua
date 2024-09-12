@@ -873,6 +873,8 @@ require('lazy').setup({
         
         g.ale_fixers = {
           python = { 'ruff' },
+          javascript = { 'eslint' },
+          typescript = { 'eslint' },
         }
       end,
     },
