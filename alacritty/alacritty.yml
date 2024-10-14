@@ -128,7 +128,7 @@ env:
 
 # Font configuration
 font:
-  size: 24
+  size: 18
   # Normal (roman) font face
   normal:
     # Font family

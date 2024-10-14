@@ -353,11 +353,16 @@ require('lazy').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            i = {
+              ['<C-i>'] = require 'custom.insert-file-content',
+            },
+            n = {
+              ['<C-i>'] = require 'custom.insert-file-content',
+            },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -391,6 +396,19 @@ require('lazy').setup {
           previewer = false,
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
+
+      -- Choose a file and insert file contents
+      vim.keymap.set('n', '<leader>if', function()
+        -- You can pass additional configuration to telescope to change theme, layout, etc.
+        builtin.find_files {
+          prompt_title = 'Insert File',
+          attach_mappings = function(_, map)
+            map('i', '<CR>', require 'custom.insert-file-content')
+            map('n', '<CR>', require 'custom.insert-file-content')
+            return true
+          end,
+        }
+      end, { desc = '[I]nsert [f]ile contents' })
 
       -- Also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -503,24 +521,6 @@ require('lazy').setup {
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.server_capabilities.documentHighlightProvider then
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.clear_references,
-            })
-          end
         end,
       })
 
@@ -632,6 +632,7 @@ require('lazy').setup {
         css = { { 'prettierd', 'prettier' } },
         html = { { 'prettierd', 'prettier' } },
         ['.astro'] = { { 'prettierd', 'prettier' } },
+        twig = { 'djlint' },
       },
     },
   },
@@ -750,6 +751,12 @@ require('lazy').setup {
       }
     end,
   },
+  {
+    'L3MON4D3/LuaSnip',
+    config = function()
+      require('luasnip.loaders.from_lua').load { paths = { './lua/custom/snippets' } }
+    end,
+  },
 
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
@@ -835,11 +842,20 @@ require('lazy').setup {
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'astro', 'elixir' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'astro', 'elixir', 'typescript' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = 'gnn',
+            node_incremental = 'grn',
+            scope_incremental = 'grc',
+            node_decremental = 'grm',
+          },
+        },
       }
 
       -- There are additional nvim-treesitter modules that you can use to interact
@@ -848,6 +864,24 @@ require('lazy').setup {
       --    - Incremental selection: Included, see :help nvim-treesitter-incremental-selection-mod
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+
+      require('custom.treesitter_query').setup {
+        keymaps = {
+          n = {
+            ['<leader>tsq'] = function()
+              require('custom.treesitter_query').create_query_builder()
+            end,
+            ['<leader>tsi'] = function()
+              require('custom.treesitter_query').inspect_tree()
+            end,
+          },
+          v = {
+            ['<leader>tsq'] = function()
+              require('custom.treesitter_query').create_query_builder()
+            end,
+          },
+        },
+      }
     end,
   },
   {
@@ -858,6 +892,9 @@ require('lazy').setup {
       require('copilot').setup {
         suggestion = { enabled = false },
         panel = { enabled = false },
+        filetypes = {
+          scm = true,
+        },
       }
     end,
   },
@@ -865,6 +902,13 @@ require('lazy').setup {
     'zbirenbaum/copilot-cmp',
     config = function()
       require('copilot_cmp').setup()
+    end,
+  },
+  {
+    'joshuavial/aider.nvim',
+    config = function()
+      vim.api.nvim_set_keymap('n', '<leader>oa', '<cmd>lua AiderOpen()<cr>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>ob', '<cmd>lua AiderBackground()<cr>', { noremap = true, silent = true })
     end,
   },
 
@@ -887,6 +931,93 @@ require('lazy').setup {
   --    For additional information see: :help lazy.nvim-lazy.nvim-structuring-your-plugins
   { import = 'custom.plugins' },
 }
+
+-- LSP settings for JavaScript/TypeScript
+local lspconfig = require 'lspconfig'
+
+lspconfig.tsserver.setup {
+  on_attach = function(_client, bufnr)
+    -- Keymap for extracting JavaScript function
+    vim.api.nvim_buf_set_keymap(bufnr, 'x', '<Leader>ej', ':lua extract_js_function()<CR>', { noremap = true, silent = true })
+  end,
+}
+
+lspconfig.emmet_language_server.setup {
+  filetypes = { 'css', 'eruby', 'html', 'javascript', 'javascriptreact', 'less', 'sass', 'scss', 'pug', 'typescriptreact', 'twig' },
+}
+
+lspconfig.rust_analyzer.setup {
+  settings = {
+    ['rust-analyzer'] = {
+      diagnostics = {
+        enable = false,
+      },
+    },
+  },
+}
+
+lspconfig.tailwindcss.setup {
+  settings = {
+    tailwindCSS = {
+      emmetCompletions = true,
+    },
+  },
+  filetypes = {
+    'aspnetcorerazor',
+    'astro',
+    'astro-markdown',
+    'blade',
+    'clojure',
+    'django-html',
+    'htmldjango',
+    'edge',
+    'eelixir',
+    'elixir',
+    'ejs',
+    'erb',
+    'eruby',
+    'gohtml',
+    'gohtmltmpl',
+    'haml',
+    'handlebars',
+    'hbs',
+    'html',
+    'html-eex',
+    'heex',
+    'jade',
+    'leaf',
+    'liquid',
+    'markdown',
+    'mdx',
+    'mustache',
+    'njk',
+    'nunjucks',
+    'php',
+    'razor',
+    'slim',
+    'twig',
+    'css',
+    'less',
+    'postcss',
+    'sass',
+    'scss',
+    'stylus',
+    'sugarss',
+    'javascript',
+    'javascriptreact',
+    'reason',
+    'rescript',
+    'typescript',
+    'typescriptreact',
+    'vue',
+    'svelte',
+    'templ',
+  },
+}
+
+require 'custom.for-blog-twig-component-extract'
+require 'custom.twig-component-css'
+require 'custom.extract-js-function-without-treesitter'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

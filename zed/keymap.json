@@ -1,0 +1,14 @@
+[
+  {
+    "bindings": {
+      // "space f": "project_search::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor && inline_completion && !showing_completions",
+    "bindings": {
+      "tab": "editor::AcceptInlineCompletion",
+      "ctrl-y": "editor::AcceptInlineCompletion"
+    }
+  }
+]
