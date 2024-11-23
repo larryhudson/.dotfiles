@@ -10,14 +10,14 @@
   "assistant": {
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-3-5-sonnet-20240620"
+      "model": "claude-3-5-sonnet-latest"
     },
     "version": "2"
   },
   "theme": "Catppuccin Mocha",
   "vim_mode": true,
-  "ui_font_size": 16,
-  "buffer_font_size": 16,
+  "ui_font_size": 18,
+  "buffer_font_size": 18,
   "relative_line_numbers": true,
   "ui_font_family": "Zed Plex Sans",
   "buffer_font_family": "JetBrainsMono Nerd Font",

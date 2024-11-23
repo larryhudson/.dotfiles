@@ -855,32 +855,6 @@ require('lazy').setup({
       -- Open parent diretory in floating window
       vim.keymap.set('n', '<space>-', require('oil').toggle_float)
     end,
-    {
-      'dense-analysis/ale',
-      config = function()
-        -- Configuration goes here.
-        local g = vim.g
-
-        g.ale_ruby_rubocop_auto_correct_all = 1
-
-        g.ale_linters = {
-          ruby = { 'rubocop', 'ruby' },
-          lua = { 'lua_language_server' },
-          python = { 'pylint', 'ruff' },
-          javascript = { 'eslint' },
-          typescript = { 'eslint' },
-        }
-        
-        g.ale_fixers = {
-          python = { 'ruff' },
-          javascript = { 'eslint' },
-          typescript = { 'eslint' },
-        }
-
-        -- Set up keymap for applying fixes
-        vim.keymap.set('n', '<leader>af', vim.cmd.ALEFix, { desc = '[A]LE [F]ix' })
-      end,
-    },
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
