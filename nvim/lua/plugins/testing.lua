@@ -1,17 +1,32 @@
 return {
   {
     "nvim-neotest/neotest",
-    keys = {
-      {
-        "<leader>dt",
-        function()
-          require("neotest").run.run({ strategy = "dap" })
-        end,
+    keys = function()
+      local neotest = require("neotest")
+      return {
         {
-          desc = "Test - Run nearest",
+          "<leader>tt",
+          function()
+            neotest.run.run()
+          end,
+          { desc = "Test - Debug nearest" },
         },
-      },
-    },
+        {
+          "<leader>dt",
+          function()
+            neotest.run.run({ strategy = "dap" })
+          end,
+          { desc = "Test - Debug nearest" },
+        },
+        {
+          "<leader>df",
+          function()
+            neotest.run.run(vim.fn.expand("%"))
+          end,
+          { desc = "Test - Run file" },
+        },
+      }
+    end,
   },
   {
     "rcarriga/nvim-dap-ui",
