@@ -144,20 +144,20 @@ return {
       local function get_python_path()
         local venv = vim.fn.getcwd() .. '/.venv/bin/python'
         local poetry = vim.fn.getcwd() .. '/poetry.lock'
-        
+
         if vim.fn.filereadable(poetry) == 1 then
           return vim.fn.system('poetry env info -p'):gsub('\n', '') .. '/bin/python'
         elseif vim.fn.filereadable(venv) == 1 then
           return venv
         else
-          return vim.fn.exepath('python3') or vim.fn.exepath('python')
+          return vim.fn.exepath 'python3' or vim.fn.exepath 'python'
         end
       end
 
       require('neotest').setup {
         adapters = {
           require 'neotest-python' {
-            dap = { 
+            dap = {
               justMyCode = false,
               -- Use debugpy's python for debugging but project's python for running tests
               python = '~/.local/share/nvim/mason/packages/debugpy/venv/bin/python',
