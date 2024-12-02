@@ -8,6 +8,7 @@ return {
       { "<leader>ws", telescope_builtin.lsp_dynamic_workspace_symbols, desc = "LSP [W]orkspace [S]ymbols" },
       { "<leader>ds", telescope_builtin.lsp_document_symbols, desc = "LSP [D]ocument [S]ymbols" },
       { "<leader><Space>", telescope_builtin.buffers, desc = "Open Buffers" },
+      { "<leader>gs", false },
     })
   end,
 }

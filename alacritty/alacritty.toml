@@ -1,3 +1,4 @@
+[general]
 import = ["/home/larry/.config/alacritty/catppuccin-mocha.toml"]
 
 [env]
